@@ -8,7 +8,10 @@
 # Consult manual for more options, validators, etc.
 
 
-
+db.define_table('user_type',
+    Field('who', 'reference auth_user'),
+    Field('what', default='o')
+)
 
 # after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

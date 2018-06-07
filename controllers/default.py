@@ -17,9 +17,22 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-    response.flash = T("Hello World")
+    # response.flash = T("Hello World")
+
+    if auth.user is not None: #if the user is logged in
+        if db(db.user_type.who == auth.user.id).select().first(): # if an entry in the database exists
+            if db((db.user_type.who == auth.user.id) & (db.user_type.what == 'tenant')).select().first():
+                redirect(URL('default','tenant'))
+            else:
+                redirect(URL('default','landlord'))
+        else:
+            redirect(URL('default','typepage'))
+
+
     return dict(message=T('Welcome to web2py!'))
 
+def typepage():
+    return dict()
 
 def user():
     """
@@ -57,5 +70,24 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
+
+
+def tenant():
+    return dict()
+
+
+def landlord():
+    return dict()
+
+@auth.requires_signature()
+def updateType():
+    if request.args(0) is not None:
+        db.user_type.insert(
+            who = auth.user.id,
+            what = request.args(0),
+        )
+    redirect(URL('default','index'))
+
+
 
 
