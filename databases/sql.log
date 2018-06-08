@@ -78,3 +78,10 @@ CREATE TABLE "user_type"(
     "what" CHAR(512)
 );
 success!
+timestamp: 2018-06-07T19:50:46.040679
+CREATE TABLE "user_pref"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "who" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "what" CHAR(512)
+);
+success!

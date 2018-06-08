@@ -20,8 +20,8 @@ def index():
     # response.flash = T("Hello World")
 
     if auth.user is not None: #if the user is logged in
-        if db(db.user_type.who == auth.user.id).select().first(): # if an entry in the database exists
-            if db((db.user_type.who == auth.user.id) & (db.user_type.what == 'tenant')).select().first():
+        if db(db.user_pref.who == auth.user.id).select().first(): # if an entry in the database exists
+            if db((db.user_pref.who == auth.user.id) & (db.user_pref.what == 'tenant')).select().first():
                 redirect(URL('default','tenant'))
             else:
                 redirect(URL('default','landlord'))
@@ -82,7 +82,7 @@ def landlord():
 @auth.requires_signature()
 def updatePref():
     if request.args(0) is not None:
-        db.user_type.insert(
+        db.user_pref.insert(
             who = auth.user.id,
             what = request.args(0),
         )

@@ -8,7 +8,7 @@
 # Consult manual for more options, validators, etc.
 
 
-db.define_table('user_type',
+db.define_table('user_pref',
     Field('who', 'reference auth_user'),
     Field('what', default='o')
 )
