@@ -26,12 +26,12 @@ def index():
             else:
                 redirect(URL('default','landlord'))
         else:
-            redirect(URL('default','typepage'))
+            redirect(URL('default','prefpage'))
 
 
     return dict(message=T('Welcome to web2py!'))
 
-def typepage():
+def prefpage():
     return dict()
 
 def user():
@@ -80,7 +80,7 @@ def landlord():
     return dict()
 
 @auth.requires_signature()
-def updateType():
+def updatePref():
     if request.args(0) is not None:
         db.user_type.insert(
             who = auth.user.id,
