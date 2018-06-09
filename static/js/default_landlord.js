@@ -101,7 +101,7 @@ var app = function() {
 
         },
         function(data){
-
+            self.cancel_form();
         });
 
     };

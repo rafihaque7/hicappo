@@ -26,7 +26,7 @@ db.define_table('listing',
     Field('group_id', 'reference group_table'),
     Field('tenant',  'reference auth_user'),
     Field('amount'),
-    Field('last_paid', default = -1),
+    Field('last_paid'),
     Field('status',default=False),
     Field('linked',default=False),
 
