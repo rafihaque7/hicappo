@@ -1,0 +1,282 @@
+
+{{block head}}
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script>
+        var get_groupnames_url = "{{=URL('api','getGroupNames',user_signature=True)}}"
+        var add_group_url = "{{=URL('api','addGroup',user_signature=True)}}"
+        var add_listing_url = "{{=URL('api','addListing',user_signature=True)}}"
+        var get_listings_url = "{{=URL('api','getListings',user_signature=True)}}"
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<title>Hicappo</title>
+
+<!-- Bootstrap CSS CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!-- Our Custom CSS -->
+<link rel="stylesheet" href="{{=URL('static','css/style2.css')}}">
+<!-- Scrollbar Custom CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+<script src="https://checkout.stripe.com/checkout.js"></script>
+
+{{end}}
+
+<div class="main_content">
+<div id="vue-div" class="display:none">
+<div class="wrapper">
+    <!-- Sidebar Holder -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Landlord</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+        
+            <li>
+                    <a href="#">Properties</a>
+            </li>
+            <li>
+                <a href="#">Maintenance</a>
+            </li>
+            <li>
+                <a href="#">Settings</a>
+            </li>
+        </ul>
+
+        <!-- <ul class="list-unstyled CTAs">
+            <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a></li>
+            <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a></li>
+        </ul> -->
+    </nav>
+
+    <!-- Page Content Holder -->
+    <div id="content">
+
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                        <i class="glyphicon glyphicon-align-left"></i>
+                        <span></span>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalgroup">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                        <span>Add Group</span>
+                                    </button>
+                                </div>
+                        
+                            <div class="col-md-4" >
+                                <button type="button" class="btn btn-primary" v-on:click="change_is_add_property">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    <span>Add Property</span>
+                                </button>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a type="button" class="btn btn-danger" href="{{=URL('default','user',args='logout')}}">
+                                        <i class="glyphicon glyphicon-log-out"></i>
+                                        <span>Logout</span>
+                                </a>
+                            </div>
+                            
+                            
+
+                            </div>
+                        
+               
+       
+                    </ul>
+                </div>
+            </div>
+        </nav>
+       
+                <!-- Your code goes here.  Remember to call $("#vue-div").show() once you get the data for the first time. -->
+                
+                
+
+        <!-- Modal for adding groups -->
+
+        <div id="modalgroup" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Add a group</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                                <input class="form-control" v-model="form_new_group">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" v-on:click="add_group()" data-dismiss="modal">Add</button>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+              
+                </div>
+        </div>
+
+
+        
+        <div class = "form-group" id = "goog">
+            <label for="exampleInputEmail1">Full Address</label>
+            <input v-model= "form_address"class="form-control" id="searchTextField" type="text" size="100">
+        </div>
+        
+        <div v-if="is_add_property">
+
+
+            <div v-if = "page=='add1'">
+                
+                <button v-on:click="goto('add2')" type="button" class="btn btn-primary"> Next </button>
+                <button v-on:click = "cancel_form" type="button" class="btn btn-danger" >Cancel</button>
+            </div>
+
+            <div v-if = "page=='add2'">
+                <form>
+
+                    <div class="form-group">
+                            <label for="address">Address</label>
+                            <input v-model="form_address" size="100" style="border: 0px; text-align:center; font-weight: bold;">
+                    </div>
+
+                    <div class="form-group">
+                            <label for="address">Preferred Name</label>
+                            <input class="form-control" v-model="form_prefname">
+                    </div>
+
+
+                    <label for="address">Group</label>
+                    <div class="btn-group dropright">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ${form_group.name}
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <li v-for= "groupi in group_names">
+                            <a class="dropdown-item" v-on:click="set_form_group(groupi.name,groupi.id)">${groupi.name}</a>
+                            </li>
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                            <label for="exampleInputEmail2">Tenant Email</label>
+                            <input v-model="form_tenant_email" type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com">
+                    
+                    </div>
+
+                    <div class="form-group">
+                            <label for="exampleInputEmail2">Rent Amount</label>
+                            <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
+                            <div class="input-group">
+                              <div class="input-group-addon">$</div>
+                              <input v-model="form_amount" type="text" class="form-control" id="exampleInputAmount" placeholder="Amount">
+                              <div class="input-group-addon">.00</div>
+                            </div>
+                    </div>
+
+                    <button v-on:click="submit_add_property" type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-warning" v-on:click="hide">Hide</button>
+                    <button v-on:click = "cancel_form" type="button" class="btn btn-danger" >Cancel</button>
+                    
+                
+                </form>
+            </div>
+        </div>
+            
+                
+            
+        
+        <div  v-if= "!is_add_property"  class="jumbotron">
+                <div class="container">
+            
+                <!-- Do v-for on this ine below . The outer jumbotron is for gray color -->
+             <div v-for= "listing in listings"style="background-color:white !important" class="jumbotron">
+    
+             <div class="row">
+       
+                <div class="col-md-4">
+                      <!-- <img src="testing.jpg" width="200px" alt="..." class="img-rounded"> -->
+                      <img v-bind:src="'https://s3-us-west-2.amazonaws.com/hfc-ad-prod/plan_assets/324995624/large/85223ms_front_1510093255.jpg?1510093255'" width="100%"  class="padded"/>
+                </div>
+                <div class="col-md-4">
+                    <h2>${listing.address}</h2>
+                      <h4>Name</h4> ${listing.tenant_name}
+                      <h4>Last paid</h4> ${listing.last_paid}
+                      <h4>Amount</h4> ${listing.amount}
+       
+                </div>
+                <div class="col-md-4" >
+                      <button type="button" class="btn btn-lg btn-block btn-success">Paid</button>
+                      <button type="button" class="btn btn-lg btn-block btn-danger">Not Linked</button>
+                </div>
+                
+             </div> 
+             </div>
+             </div>
+        </div>
+        <!-- The listings go here -->
+        <!-- <div v-for= "listing in listings" v-if= "!is_add_property">
+            ${listing.address}
+            <br>
+            ${listing.pref_name}
+            <br>
+            ${listing.group_name}
+            <br>
+            ${listing.tenant_name}
+            <br>
+            ${listing.amount}
+            <br>
+            ${listing.last_paid}
+            <br>
+            ${listing.status}
+            <br>
+            ${listing.linked}
+        </div> -->
+        <!-- <h2>Collapsible Sidebar Using Bootstrap 3</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+        <div class="line"></div>
+
+        <h2>Lorem Ipsum Dolor</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> -->
+
+    </div>
+</div>
+
+</div>     
+</div>
+
+
+
+
+
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+
+
+
+
+
+<script src="{{=URL('static', 'js/default_landlord.js')}}"></script>

@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.AttributeError'> 'NoneType' object has no attribute 'namej'"
+p3
+sS'layer'
+p4
+S'/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py'
+p5
+sS'code'
+p6
+S'<code object <module> at 0x1109f9b30, file "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 3>'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/Users/rafihaque/Documents/cmps183/web2py/gluon/restricted.py", line 219, in restricted\n    exec(ccode, environment)\n  File "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 44, in <module>\n  File "/Users/rafihaque/Documents/cmps183/web2py/gluon/globals.py", line 419, in <lambda>\n    self._caller = lambda f: f()\n  File "/Users/rafihaque/Documents/cmps183/web2py/gluon/tools.py", line 3982, in f\n    return action(*a, **b)\n  File "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 41, in addListing\n    logger.info(address + prefname + groupobj.namej + tenantEmail + amount)\nAttributeError: \'NoneType\' object has no attribute \'namej\'\n'
+p11
+s.
