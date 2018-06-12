@@ -71,11 +71,11 @@ def call():
     """
     return service()
 
-
+@auth.requires_login()
 def tenant():
     return dict()
 
-
+@auth.requires_login()
 def landlord():
     return dict()
 
@@ -87,6 +87,25 @@ def updatePref():
             what = request.args(0),
         )
     redirect(URL('default','index'))
+
+
+# @auth.requires_signature()
+# def payment_history():
+#     if request.args(0) == "landlord":
+#         q = db.payment_history.landlord == auth.user.id
+#         form = SQLFORM.grid(
+#             q,
+#             fields = [db.payment_history.tenant,db.payment_history.amount,db.payment_history.updated_on],
+#         )
+
+#     elif request.args(0) == "tenant":
+#         q = db.payment_history.id > 0
+#         form = SQLFORM.grid(
+#             q,
+#             fields = [db.payment_history.landlord,db.payment_history.amount,db.payment_history.updated_on],
+#         )
+
+#     return dict(form=form)
 
 
 

@@ -1,124 +1,312 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+{{block head}}
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script src="https://checkout.stripe.com/checkout.js"></script>
 
-        <title>Collapsible sidebar using Bootstrap 3</title>
+<script>
+    var change_default_url = "{{=URL('api','change_default',user_signature=True)}}";
+    var find_temp_listings_url = "{{=URL('api','find_temp_listings',user_signature=True)}}";
+    var temp_to_permanent_url = "{{=URL('api','temp_to_permanent',user_signature=True)}}";
+    var tenant_listings_url = "{{=URL('api','get_tenant_listings',user_signature=True)}}";
+    var purchase_url = "{{=URL('api', 'purchase', hmac_key=session.hmac_key)}}";
+    var payment_history_content_url = "{{=URL('api','payment_history_content',user_signature=True)}}";
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-        <!-- Bootstrap CSS CDN -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <!-- Our Custom CSS -->
-        <link rel="stylesheet" href="{{=URL('static','css/style2.css')}}">
-        <!-- Scrollbar Custom CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<title>Hicappo</title>
 
-    </head>
-    <body>
+<!-- Bootstrap CSS CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!-- Our Custom CSS -->
+<link rel="stylesheet" href="{{=URL('static','css/style2.css')}}">
+<!-- Scrollbar Custom CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<link rel="stylesheet" href="{{=URL('static', 'font-awesome-4.6.3/css/font-awesome.min.css')}}">
+<link href="{{=URL('static','css/myapp.css')}}" rel="stylesheet" type="text/css"/>
+
+{{end}}
 
 
+<div class="main_content">
+<div id="vue-div" class="display:none">
 
-        <div class="wrapper">
-            <!-- Sidebar Holder -->
-            <nav id="sidebar">
-                <div class="sidebar-header">
-                    <h3>Bootstrap Sidebar</h3>
+<div class="wrapper">
+    <!-- Sidebar Holder -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Tenant</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li>
+                    <a v-on:click="goto('home')">Properties</a>
+            </li>
+            <li v-bind:class="{'active': page == 'payment_history', '': !(page == !'payment_history')}">
+                    <a v-on:click="get_payment_history">Payment History</a>
+            </li>
+            <li>
+                <a v-on:click="goto('settings')">Settings</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Page Content Holder -->
+    <div id="content">
+            <div id="loading" class="alert alert-warning" role="alert">
+                    Loading<div class="loader"></div>
+           </div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                        <i class="glyphicon glyphicon-align-left"></i>
+                        <span></span>
+                    </button>
                 </div>
 
-                <ul class="list-unstyled components">
-                    <p>Tenant</p>
-                    <li>
-                        <a href="#">About</a>
-                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">Pages</a>
-                        <ul class="collapse list-unstyled" id="pageSubmenu">
-                            <li><a href="#">Page 1</a></li>
-                            <li><a href="#">Page 2</a></li>
-                            <li><a href="#">Page 3</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Portfolio</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
-                    </li>
-                </ul>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <div class = "row">
+                                <div class="col-md-6" >
+                                        <button v-on:click="click_email" type="button" class="btn btn-primary">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                            <span> Email</span>
+                                        </button>
+                                </div>
 
-                <ul class="list-unstyled CTAs">
-                    <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a></li>
-                    <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a></li>
-                </ul>
-            </nav>
+                                <div class="col-md-4">
+                                        <a type="button" class="btn btn-danger" href="{{=URL('default','user',args='logout')}}">
+                                                <i class="glyphicon glyphicon-log-out"></i>
+                                                <span>Logout</span>
+                                        </a>
+                                </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
-            <!-- Page Content Holder -->
-            <div id="content">
+        <div v-if="page=='settings'">
+            <div class= "form-group">
+                    <label>Set as default </label>
+                
+                        <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Dropdown
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a v-on:click = "change_default('landlord')">Landlord</a></li>
+                                    <li><a v-on:click ="change_default('tenant')">Tenant</a></li>
+                                </ul>
+                        </div>
+                </div>
+        </div>
 
-                <nav class="navbar navbar-default">
-                    <div class="container-fluid">
 
-                        <div class="navbar-header">
-                            <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-                                <i class="glyphicon glyphicon-align-left"></i>
-                                <span>Toggle Sidebar</span>
-                            </button>
+        <div v-if = "page=='payment_history'">
+
+            <table class = "table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Landlord Name</th>
+                        <th>Month</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Updated On</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody  v-for="report in payment_history">
+                    <tr>
+                        <th>${report.id}</th>
+                        <td>${report.landlord_full_name}</td>
+                        <td>${report.for_month}</td>
+                        <td>${report.landlord_email}</td>
+                        <td>${report.address}</td>
+                        <td>${report.updated_on}</td>
+                        <td>${report.amount}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- modal stuff -->
+        <div id = "modal_found_listing" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title">Would you like to add this listing with your accout?</h4>
+                      <small>We found a listing associated with your email address</small>
+                    </div>
+                    <div class="modal-body">
+                      
+                        <div class = "container">
+                                <div class="jumbotronf">
+                                    <div class = "row">
+                                        <div class="col-md-3">
+                                                <img v-bind:src="temp_listing.image_url" width="100%"  class="padded"/>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                                <h3>${temp_listing.address}</h3>
+                                                <h5>${temp_listing.pref_name}</h5>
+                                                Requested by ${temp_listing.landlord}
+
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
 
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#">Page</a></li>
-                                <li><a href="#">Page</a></li>
-                                <li><a href="#">Page</a></li>
-                                <li><a href="#">Page</a></li>
-                            </ul>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                      <button v-on:click="temp_to_permanent"type="button" class="btn btn-primary">Yes</button>
+                    </div>
+                  </div><!-- /.modal-content -->
+       
+                </div><!-- /.modal-dialog -->
+              </div><!-- /.modal -->
+
+
+            <div id = "modalemail" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <div id="noresult" class="alert alert-warning" role="alert">
+                            <h4> No result found</h4>
+                       </div>
+                        <h4 class="modal-title">Search for listing with Email Address</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                                <input class="form-control" v-model="form_email">
                         </div>
                     </div>
-                </nav>
+                    <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" v-on:click="find_with_email"> Search</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    </div>
+                
+                </div>
+        </div>
 
-                <h2>Collapsible Sidebar Using Bootstrap 3</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <div v-if="page=='home'">
+                <div class="container">
+            
+                        <!-- Do v-for on this ine below . The outer jumbotron is for gray color -->
+                    <div v-for= "listing in tenant_listings">
+                        <div style="background-color:white !important" class="jumbotron">
+                        
+                    <div class="row">
+            
+                        <div class="col-md-4">
+                           <img v-bind:src="listing.image_url" width="100%"  class="padded"/>
+                        </div>
+                        <div class="col-md-4">
+                            <h2>${listing.address}</h2>
+                            <h4>${listing.pref_name}</h4>
+                  
+                            <div v-if="listing.last_paid">
+                            <h4>Last paid</h4> ${listing.last_paid}
+                            </div>
+                            <h4>Amount</h4> <h5>$${listing.amount}</h5>
+                        </div>
+                        <div class="col-md-4" >
+                            <div v-if="listing.paid_this_month==true">
+                                <button type="button" class="btn btn-lg btn-block btn-success">Paid</button>
+                            </div>
+                            <div v-else>
+                                    <button v-on:click="make_payment_unit(listing._idx)" type="button" class="btn btn-lg btn-block btn-danger">Make a Payment</button>
+                            </div>
+                            <br>
+                            <div class="col-md-6" >
+                            <h5>Landlord Name</h5> ${listing.landlord}
+                            </div>
+                            <div class="col-md-6" >
+                            <h5>Landlord Name</h5> ${listing.landlord_email}
+                            </div>
+                        </div>
+                        
+                    </div> 
+                    </div>
+                    </div>
+                </div>
 
-                <div class="line"></div>
+        </div>
 
-                <h2>Lorem Ipsum Dolor</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-                <div class="line"></div>
+        <div v-if="page=='payment'">
+            <div class = "container">
+                <i class="fa fa-cc-visa fa-5x" aria-hidden="true"></i>
+                <i class="fa fa-cc-mastercard fa-5x" aria-hidden="true"></i>
+                <i class="fa fa-cc-amex fa-5x" aria-hidden="true"></i>
+                <i class="fa fa-cc-discover fa-5x" aria-hidden="true"></i>
+            </div>
 
-                <h2>Lorem Ipsum Dolor</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <div>
+                <h2>Payment Information</h2> 
+                <div class = "row">
+                    <div class = "col-md-3">
+                        <h4>Amount Paid Today: </h4>
+                    </div>
+                    <div class = "col-md-2">
+                            <h5>$${payment_checkout_unit.amount}</h5>
+                        </div>
+                </div>
 
-                <div class="line"></div>
-
-                <h3>Lorem Ipsum Dolor</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <div class = "row">
+                        <div class = "col-md-3">
+                                <h5>For month: </h5>
+                            </div>
+                            <div class = "col-md-2">
+                                    <h6> ${payment_checkout_unit.cur_month}</h6>
+                            </div>
+                </div>
+                <div class = "row">
+                        <div class = "col-md-3">
+                                <h5>For Unit: </h5>
+                            </div>
+                            <div class = "col-md-2">
+                                    <h6> ${payment_checkout_unit.address} </h6>
+                                    <h6> ${payment_checkout_unit.pref_name} </h6>
+                            </div>
+                </div>
+                <br>
+                <div class = "row">
+                        <button class="btn btn-primary" v-on:click="pay()"><i class="fa fa-lg fa-credit-card fa-2x"></i> Pay</button>
+                </div>
             </div>
         </div>
 
 
+        <div v-if="page=='success'">
+            Payment was Successful!
+            <i class="fa fa-handshake-o fa-5x" aria-hidden="true"></i>
+        </div>
+    </div>
+</div>
 
 
+</div>
+</div>
 
-        <!-- jQuery CDN -->
-        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-        <!-- Bootstrap Js CDN -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <!-- jQuery Custom Scroller CDN -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#sidebar").mCustomScrollbar({
-                    theme: "minimal"
-                });
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
-                $('#sidebarCollapse').on('click', function () {
-                    $('#sidebar, #content').toggleClass('active');
-                    $('.collapse.in').toggleClass('in');
-                    $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-                });
-            });
-        </script>
-    </body>
-</html>
+
+<script src="{{=URL('static', 'js/default_tenant.js')}}"></script>

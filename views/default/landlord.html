@@ -2,10 +2,13 @@
 {{block head}}
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-        var get_groupnames_url = "{{=URL('api','getGroupNames',user_signature=True)}}"
-        var add_group_url = "{{=URL('api','addGroup',user_signature=True)}}"
-        var add_listing_url = "{{=URL('api','addListing',user_signature=True)}}"
-        var get_listings_url = "{{=URL('api','getListings',user_signature=True)}}"
+        var get_groupnames_url = "{{=URL('api','getGroupNames',user_signature=True)}}";
+        var add_group_url = "{{=URL('api','addGroup',user_signature=True)}}";
+        var add_listing_url = "{{=URL('api','addListing',user_signature=True)}}";
+        var get_listings_url = "{{=URL('api','getListings',user_signature=True)}}";
+        var add_image_url = "{{=URL('api','add_image',user_signature=True)}}";
+        var change_default_url = "{{=URL('api','change_default',user_signature=True)}}";
+        var payment_history_content_url = "{{=URL('api','payment_history_content',user_signature=True)}}";
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +30,7 @@
 
 <div class="main_content">
 <div id="vue-div" class="display:none">
+        
 <div class="wrapper">
     <!-- Sidebar Holder -->
     <nav id="sidebar">
@@ -36,26 +40,25 @@
 
         <ul class="list-unstyled components">
         
-            <li>
-                    <a href="#">Properties</a>
+            <li v-bind:class="{'active': page == 'home', '': !(page == !'home')}">
+                    <a v-on:click="goto('home')">Properties</a>
             </li>
-            <li>
-                <a href="#">Maintenance</a>
+            <li v-bind:class="{'active': page == 'payment_history', '': !(page == !'payment_history')}">
+                <a v-on:click="get_payment_history">Payment History</a>
             </li>
-            <li>
-                <a href="#">Settings</a>
+            <li v-bind:class="{'active': page == 'settings', '': !(page == !'settings')}">
+                <a v-on:click="goto('settings')">Settings</a>
             </li>
         </ul>
 
-        <!-- <ul class="list-unstyled CTAs">
-            <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a></li>
-            <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a></li>
-        </ul> -->
     </nav>
 
     <!-- Page Content Holder -->
     <div id="content">
-
+            <div id="loading" class="alert alert-warning" role="alert">
+                     Loading<div class="loader"></div>
+            </div>
+            
         <nav class="navbar navbar-default">
             <div class="container-fluid">
 
@@ -72,13 +75,13 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalgroup">
-                                        <i class="glyphicon glyphicon-plus"></i>
+                                        <i class="glyphicon glyphicon-th-large"></i>
                                         <span>Add Group</span>
                                     </button>
                                 </div>
                         
                             <div class="col-md-4" >
-                                <button type="button" class="btn btn-primary" v-on:click="change_is_add_property">
+                                <button type="button" class="btn btn-primary" v-on:click="goto('add1')">
                                     <i class="glyphicon glyphicon-plus"></i>
                                     <span>Add Property</span>
                                 </button>
@@ -137,7 +140,6 @@
             <input v-model= "form_address"class="form-control" id="searchTextField" type="text" size="100">
         </div>
         
-        <div v-if="is_add_property">
 
 
             <div v-if = "page=='add1'">
@@ -189,73 +191,130 @@
                             </div>
                     </div>
 
-                    <button v-on:click="submit_add_property" type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
-                    <button type="button" class="btn btn-warning" v-on:click="hide">Hide</button>
-                    <button v-on:click = "cancel_form" type="button" class="btn btn-danger" >Cancel</button>
+                    <div class="form-group">
+                            <label for="uploadingfile">Upload an image file: </label>
+                            <input id="file_input" type="file" v-on:change="upload_file" accept="image/jpeg">
+                    </div>
+        
+
+                    <div>
+                        <button v-on:click="submit_add_property" type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
+                        <button type="button" class="btn btn-warning" v-on:click="hide">Hide</button>
+                        <button v-on:click = "cancel_form" type="button" class="btn btn-danger" >Cancel</button>
+                    </div>
                     
                 
                 </form>
             </div>
-        </div>
+
             
                 
             
+        <div v-if = "page=='settings'">
+            <div class= "form-group">
+                <label>Set as default </label>
+           
+                    <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                              Dropdown
+                              <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              <li><a v-on:click = "change_default('landlord')">Landlord</a></li>
+                              <li><a v-on:click ="change_default('tenant')">Tenant</a></li>
+                            </ul>
+                          </div>
+            </div>
+        </div>
+
+        <div v-if = "page=='payment_history'">
+
+            <table class = "table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tenant Name</th>
+                        <th>Month</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Updated On</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody  v-for="report in payment_history">
+                    <tr>
+                        <th>${report.id}</th>
+                        <td>${report.tenant_full_name}</td>
+                        <td>${report.for_month}</td>
+                        <td>${report.tenant_email}</td>
+                        <td>${report.address}</td>
+                        <td>${report.updated_on}</td>
+                        <td>${report.amount}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <div  v-if= "page=='home'"  class="jumbotron">
+            <div class="container">
+            
+                    <!-- Do v-for on this ine below . The outer jumbotron is for gray color -->
+                <div v-for= "listing in listings">
+                        <div v-if= "listing.group_name != last_group_name">
+                                <center><h3> ${listing.group_name}</h3></center>
+                                <div id = "hideit">
+                                    ${last_group_name = listing.group_name}
+                                </div>
+                            </div>
+                    <div style="background-color:white !important" class="jumbotron">
+                    
+                <div class="row">
         
-        <div  v-if= "!is_add_property"  class="jumbotron">
-                <div class="container">
-            
-                <!-- Do v-for on this ine below . The outer jumbotron is for gray color -->
-             <div v-for= "listing in listings"style="background-color:white !important" class="jumbotron">
-    
-             <div class="row">
-       
-                <div class="col-md-4">
-                      <!-- <img src="testing.jpg" width="200px" alt="..." class="img-rounded"> -->
-                      <img v-bind:src="'https://s3-us-west-2.amazonaws.com/hfc-ad-prod/plan_assets/324995624/large/85223ms_front_1510093255.jpg?1510093255'" width="100%"  class="padded"/>
+                    <div class="col-md-4">
+                       <img v-bind:src="listing.image_url" width="100%"  class="padded"/>
+                        </div>
+                    <div class="col-md-4">
+                        <h2 v-if="!listing.pref_name">${listing.address}</h2>
+                        <h2 v-if="listing.pref_name">${listing.pref_name}</h2>
+                        <div v-if="listing.linked==1">
+                            <h4>Tenant Name</h4> ${listing.tenant_name}
+                            <div v-if="listing.last_paid">
+                            <h4>Last paid</h4> ${listing.last_paid}
+                            </div>
+                        </div>
+                        <div v-else>
+                            <h4>Linking Email</h4> ${listing.tenant_email}
+                        </div>
+                        <h4>Amount</h4> <h5>$${listing.amount}</h5>
+                        
+        
+                    </div>
+                    <div class="col-md-4" >
+                        <div v-if="listing.paid_this_month==true">
+                            <button type="button" class="btn btn-lg btn-block btn-success">Paid</button>
+                        </div>
+                        <div v-else>
+                                <button type="button" class="btn btn-lg btn-block btn-danger">Not Paid</button>
+                        </div>
+                        <br>
+
+                        
+                        <div v-if ="listing.linked==0">
+                        <button type="button" class="btn btn-lg btn-block btn-danger">Not Linked</button>
+                        </div>
+                        <div v-else>
+                            <button type="button" class="btn btn-lg btn-block btn-success">Linked</button>
+                        </div>
+                    </div>
+                    
+                </div> 
                 </div>
-                <div class="col-md-4">
-                    <h2>${listing.address}</h2>
-                      <h4>Name</h4> ${listing.tenant_name}
-                      <h4>Last paid</h4> ${listing.last_paid}
-                      <h4>Amount</h4> ${listing.amount}
-       
                 </div>
-                <div class="col-md-4" >
-                      <button type="button" class="btn btn-lg btn-block btn-success">Paid</button>
-                      <button type="button" class="btn btn-lg btn-block btn-danger">Not Linked</button>
-                </div>
-                
-             </div> 
-             </div>
-             </div>
+            </div>
         </div>
-        <!-- The listings go here -->
-        <!-- <div v-for= "listing in listings" v-if= "!is_add_property">
-            ${listing.address}
-            <br>
-            ${listing.pref_name}
-            <br>
-            ${listing.group_name}
-            <br>
-            ${listing.tenant_name}
-            <br>
-            ${listing.amount}
-            <br>
-            ${listing.last_paid}
-            <br>
-            ${listing.status}
-            <br>
-            ${listing.linked}
-        </div> -->
-        <!-- <h2>Collapsible Sidebar Using Bootstrap 3</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-        <div class="line"></div>
-
-        <h2>Lorem Ipsum Dolor</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> -->
-
+        
     </div>
 </div>
 

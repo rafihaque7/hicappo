@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.AttributeError'> 'Table' object has no attribute 'typeUser'"
+p3
+sS'layer'
+p4
+S'/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py'
+p5
+sS'code'
+p6
+S'<code object <module> at 0x1048157b0, file "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 2>'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/Users/rafihaque/Documents/cmps183/web2py/gluon/restricted.py", line 219, in restricted\n    exec(ccode, environment)\n  File "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 274, in <module>\n  File "/Users/rafihaque/Documents/cmps183/web2py/gluon/globals.py", line 419, in <lambda>\n    self._caller = lambda f: f()\n  File "/Users/rafihaque/Documents/cmps183/web2py/applications/hicappo/controllers/api.py", line 267, in payment_history\n    for r in db(db.payment_history.typeUser == auth.user.id).select():\nAttributeError: \'Table\' object has no attribute \'typeUser\'\n'
+p11
+s.
