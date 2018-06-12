@@ -44,7 +44,7 @@ var app = function() {
 
     self.get_payment_history = function() {
         self.vue.page = 'payment_history';
-
+        $("div#loading").show();
         $.post(payment_history_content_url,
             {
                 typeUser: "landlord",
@@ -52,16 +52,19 @@ var app = function() {
             },
             function(data){
                 self.vue.payment_history = data.payment_history;
+                $("div#loading").hide()
             }
         );
 
     };
     self.get_groupnames = function() {
+        $("div#loading").show()
         $.getJSON(get_groupnames_url,
         function (data) {
+            $("div#loading").hide()
             self.vue.group_names = data.groupNames;
             if(self.vue.form_group==null){
-                self.vue.form_group = data.groupNames[0];
+                self.vue.form_group = data.groupNames[0];  
             }
         });
     };
@@ -75,6 +78,7 @@ var app = function() {
     };
 
     self.add_group = function(){
+        $("div#loading").show()
         $.post(add_group_url,
             {
                 newName: self.vue.form_new_group,
@@ -83,6 +87,7 @@ var app = function() {
                 self.get_groupnames();
                 self.vue.form_new_group = null;
                 // alert(self.vue.group_names.length);
+                $("div#loading").hide();
             }   
         );
     };
@@ -104,18 +109,7 @@ var app = function() {
 
 
     self.submit_add_property = function() {
-
-        // alert(
-        //     self.vue.form_address + '\n' +
-        //     self.vue.form_prefname + '\n' +
-        //     self.vue.form_group.name + '\n' +
-        //     self.vue.form_tenant_email + '\n' +
-        //     self.vue.form_amount
-            
-            
-        // );
-
-
+        $("div#loading").show();
         $.post(add_listing_url,
         {
             form_address: self.vue.form_address,
@@ -131,6 +125,7 @@ var app = function() {
             self.cancel_form();
             
             self.get_listings();
+            $("div#loading").hide();
         
             
         });
@@ -138,12 +133,14 @@ var app = function() {
     };
 
     self.get_listings = function(){
+        $("div#loading").show()
         $.getJSON(get_listings_url,
             function(data){
                 self.vue.last_group_name = "all";
                 self.vue.listings = data.listings;
                 // alert(self.vue.listings.length);
                 // self.get_listings();
+                $("div#loading").hide()
             }
         
         );
@@ -191,12 +188,13 @@ var app = function() {
 
 
     self.change_default = function(what){
+        $("div#loading").show()
         $.post(change_default_url,
             {
                 what: what,
             },
             function(){
-
+                $("div#loading").hide()
             }
 
 

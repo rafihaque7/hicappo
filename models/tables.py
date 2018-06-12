@@ -50,7 +50,15 @@ db.define_table('templisting',
     Field('listingid', 'reference listing'),
 )
 
-
+db.define_table('maintenance',
+    Field('landlord_id', 'reference auth_user'),
+    Field('tenant_id', 'reference auth_user'),
+    Field('is_resolved', 'boolean',default = False),
+    Field('updated_on'),
+    Field('date_issued'),
+    Field('text_issue'),
+    Field('image_url'),
+)
 
 
 
@@ -62,5 +70,6 @@ db.define_table('templisting',
 # db.templisting.truncate()
 # db.user_pref.truncate()
 # db.payment_history.truncate()
+# db.auth_user.truncate()
 # after defining tales, uncomment below to enable auditing
 

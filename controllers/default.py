@@ -29,7 +29,7 @@ def index():
             redirect(URL('default','prefpage'))
 
 
-    return dict(message=T('Welcome to web2py!'))
+    return dict()
 
 def prefpage():
     return dict()
