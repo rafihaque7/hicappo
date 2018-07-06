@@ -45,7 +45,10 @@
                     <a v-on:click="goto('home')">Properties</a>
             </li>
             <li v-bind:class="{'active': page == 'payment_history', '': !(page == !'payment_history')}">
-                <a v-on:click="get_payment_history">Payment History</a>
+                <a v-on:click="goto('payment_history')">Payment History</a>
+            </li>
+            <li v-bind:class="{'active': page == 'maintenance', '': !(page == !'maintenance')}">
+                <a v-on:click="goto('maintenance')">Maintenance</a>
             </li>
             <li v-bind:class="{'active': page == 'settings', '': !(page == !'settings')}">
                 <a v-on:click="goto('settings')">Settings</a>
@@ -315,6 +318,20 @@
                 </div>
             </div>
         </div>
+
+
+        <div v-if="page=='maintenance'">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  ${dropdown_maintenance}
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="#">New</a></li>
+                  <li><a href="#">Resolved</a></li>
+                </ul>
+              </div>
+        </div>
         
     </div>
 </div>
@@ -322,21 +339,11 @@
 </div>     
 </div>
 
-
-
-
-
-
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 <!-- Bootstrap Js CDN -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <!-- jQuery Custom Scroller CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
-
-
-
-
-
 
 <script src="{{=URL('static', 'js/default_landlord.js')}}"></script>

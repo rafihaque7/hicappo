@@ -26,8 +26,9 @@ var app = function() {
     self.goto = function(pg) {
         self.vue.page = pg;
 
+        if(pg != "add1") $("div#goog").hide();
+ 
         switch(pg){
-
             case "home":
                 self.vue.last_group_name = "all";
                 break;
@@ -36,14 +37,15 @@ var app = function() {
                 break;
             case "add2":
                 self.vue.form_address = $("#searchTextField").val();
-                $("div#goog").hide();
+                break;
+            case "payment_history":
+                self.get_payment_history();
                 break;
         }
     };
 
 
     self.get_payment_history = function() {
-        self.vue.page = 'payment_history';
         $("div#loading").show();
         $.post(payment_history_content_url,
             {
@@ -221,6 +223,7 @@ var app = function() {
             listings: [],
             form_image_url: null,
             payment_history: [],
+            dropdown_maintenance: 'New',
         },
         methods: {
 

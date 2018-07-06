@@ -61,6 +61,12 @@ db.define_table('maintenance',
 )
 
 
+db.define_table('reply_maintenance',
+    Field('maintenance_id', 'reference maintenance'),
+    Field('user_id','reference auth_user'),
+    Field('message_texts')
+)
+
 
 
 
