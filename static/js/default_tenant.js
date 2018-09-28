@@ -54,7 +54,6 @@ var app = function() {
     };
 
     self.get_tenant_listings = function() {
-        alert("Hello! I am an alert box!!");
         $.getJSON(tenant_listings_url,
             function(data){
                 self.vue.tenant_listings = data.tenant_listings;
@@ -158,10 +157,13 @@ var app = function() {
 
     };
 
-    self.get_rest = function() {
-        console.log("IOt ran");
-        alert("it ran");
-    };  
+    // self.get_rest = function() {
+    //     $.getJSON('http://localhost:3003/users',
+    //         function(data) {
+    //             alert(data[0].first_name)
+    //         }
+    //     )
+    // };  
 
     
 
