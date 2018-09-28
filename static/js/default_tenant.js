@@ -54,6 +54,7 @@ var app = function() {
     };
 
     self.get_tenant_listings = function() {
+        alert("Hello! I am an alert box!!");
         $.getJSON(tenant_listings_url,
             function(data){
                 self.vue.tenant_listings = data.tenant_listings;
@@ -157,6 +158,13 @@ var app = function() {
 
     };
 
+    self.get_rest = function() {
+        console.log("IOt ran");
+        alert("it ran");
+    };  
+
+    
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -179,6 +187,7 @@ var app = function() {
             make_payment_unit: self.make_payment_unit,
             pay: self.pay,
             get_payment_history: self.get_payment_history,
+            get_rest: self.get_rest,
         
         }
 
@@ -188,6 +197,7 @@ var app = function() {
     $("div#noresult").hide();
     self.find_temp_listings();
     self.get_tenant_listings();
+    self.get_rest();
     return self;
 };
 
