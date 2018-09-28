@@ -63719,3 +63719,38 @@ success!
 success!
 success!
 success!
+success!
+timestamp: 2018-09-28T10:06:51.926552
+CREATE TABLE "reply_maintenance"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "maintenance_id" INTEGER REFERENCES "maintenance" ("id") ON DELETE CASCADE  ,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "message_texts" CHAR(512)
+);
+success!
+timestamp: 2018-09-28T10:06:59.219025
+CREATE TABLE "reply_maintenance"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "maintenance_id" INTEGER REFERENCES "maintenance" ("id") ON DELETE CASCADE  ,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "message_texts" CHAR(512)
+);
+success!
+timestamp: 2018-09-28T10:07:01.843538
+CREATE TABLE "reply_maintenance"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "maintenance_id" INTEGER REFERENCES "maintenance" ("id") ON DELETE CASCADE  ,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "message_texts" CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
